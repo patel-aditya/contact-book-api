@@ -47,8 +47,29 @@ def update_contact(contact_id: int, updated: ContactUpdate, db: Session = Depend
 
     db.commit()
     db.refresh(contact)
-
     return contact
+
+
+# delete contact
+@app.delete("/contacts/{contact_id}")
+def delete_contact(contact_id: int, db: Session = Depends(get_db)):
+    contact = db.query(models.Contact).filter(models.Contact.id == contact_id).first()
+
+    if contact:
+        db.delete(contact)
+        db.commit()
+        return "contact Deleted"    
+    return "Contact not found"
+
+
+# search using name
+@app.get("/contacts/search", response_model= List[Contact])
+def search_contacts(name: str, db: Session = Depends(get_db)):
+    result = db.query(models.Contact).filter(models.Contact.name.ilike(f"%{name}%")).all()
+
+    return result
+
+
 
 
 
