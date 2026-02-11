@@ -29,6 +29,14 @@ def create_contact(contact: ContactCreate, db: Session = Depends(get_db)):
     db.refresh(db_contact)
     return db_contact
 
+# can see all contacts
+@app.get("/contacts")
+def get_all_contacts(db: Session = Depends(get_db)):
+    return db.query(models.Contact).all()
+
+
+
+
 
     
 
