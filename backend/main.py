@@ -1,0 +1,34 @@
+from fastapi import FastAPI, Depends
+from database import engine, session
+from schemas import Contact, ContactBase, ContactCreate, ContactUpdate
+from sqlalchemy.orm import Session
+from typing import List
+
+import models
+
+app = FastAPI()
+
+
+# create database Tables
+models.Base.metadata.create_all(bind = engine)
+
+# database session provider
+def get_db():
+    db = session()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# save contact
+@app.post("/contacts", response_model= ContactCreate)
+def create_contact(contact: ContactCreate, db: Session = Depends(get_db)):
+    db_contact = models.Contact(**contact.model_dump())
+    db.add(db_contact)
+    db.commit()
+    db.refresh(db_contact)
+    return db_contact
+
+
+    
+
