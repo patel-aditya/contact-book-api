@@ -34,7 +34,21 @@ def create_contact(contact: ContactCreate, db: Session = Depends(get_db)):
 def get_all_contacts(db: Session = Depends(get_db)):
     return db.query(models.Contact).all()
 
+# update contacts
+@app.patch("contacts/{id}",response_model= ContactUpdate)
+def update_contact(contact_id: int, updated: ContactUpdate, db: Session = Depends(get_db)):
+    contact = db.query(models.Contact).filter(models.Contact.id == contact_id).first()
+    
+    if not contact:
+        return "Contact not found"
+    
+    for key, value in updated.model_dump(exclude_unset=True).items():
+        setattr(contact, key, value)
 
+    db.commit()
+    db.refresh(contact)
+
+    return contact
 
 
 
