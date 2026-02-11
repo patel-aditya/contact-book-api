@@ -35,7 +35,7 @@ def get_all_contacts(db: Session = Depends(get_db)):
     return db.query(models.Contact).all()
 
 # update contacts
-@app.patch("contacts/{id}",response_model= ContactUpdate)
+@app.patch("/contacts/{contact_id}",response_model= ContactUpdate)
 def update_contact(contact_id: int, updated: ContactUpdate, db: Session = Depends(get_db)):
     contact = db.query(models.Contact).filter(models.Contact.id == contact_id).first()
     
