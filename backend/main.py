@@ -3,11 +3,21 @@ from database import engine, session
 from schemas import Contact, ContactBase, ContactCreate, ContactUpdate
 from sqlalchemy.orm import Session
 from typing import List
+# enable  CORS for frontend
 
+from fastapi.middleware.cors import CORSMiddleware
 import models
 
 app = FastAPI()
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = ["*"], #frontend domain
+    allow_credentials = True,
+    allow_methods = ["*"],
+    allow_headers = ["*"],
+)
 
 # create database Tables
 models.Base.metadata.create_all(bind = engine)
@@ -30,7 +40,7 @@ def create_contact(contact: ContactCreate, db: Session = Depends(get_db)):
     return db_contact
 
 # can see all contacts
-@app.get("/contacts")
+@app.get("/contacts", response_model=List[Contact])
 def get_all_contacts(db: Session = Depends(get_db)):
     return db.query(models.Contact).all()
 
